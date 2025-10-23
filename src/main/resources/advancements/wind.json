@@ -1,1 +1,25 @@
+{
+  "display": {
+    "title": {"text": "Wind Spear", "color": "white"},
+    "description": {"text": "You have obtained the swift Wind Spear!"},
+    "icon": {"item": "minecraft:diamond_sword"},
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "get_wind_spear": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:diamond_sword",
+            "nbt": "{display:{Name:'{\"text\":\"Wind Spear\"}'}}"
+          }
+        ]
+      }
+    }
+  }
+}
 
