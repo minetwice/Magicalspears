@@ -1,43 +1,34 @@
 package com.minetwice.magicalspears;
 
-import org.bukkit.plugin.java.JavaPlugin;
-import com.minetwice.magicalspears.listeners.SpearHitListener;
-import com.minetwice.magicalspears.managers.*;
 import com.minetwice.magicalspears.commands.*;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class MagicalSpears extends JavaPlugin {
 
-    private static MagicalSpears instance;
     private CooldownManager cooldownManager;
     private BossbarManager bossbarManager;
     private SpearManager spearManager;
+    private boolean graceActive = false;
 
     @Override
     public void onEnable() {
-        instance = this;
-        cooldownManager = new CooldownManager();
-        bossbarManager = new BossbarManager();
-        spearManager = new SpearManager();
-
-        getServer().getPluginManager().registerEvents(new SpearHitListener(this), this);
+        cooldownManager = new CooldownManager(this);
+        bossbarManager = new BossbarManager(this);
+        spearManager = new SpearManager(this);
 
         getCommand("givespear").setExecutor(new GiveSpearCommand(this));
-        getCommand("givespears").setExecutor(new GiveAllSpearsCommand(this));
-        getCommand("cords").setExecutor(new CordsCommand(this));
-        getCommand("spears").setExecutor(new SpearsGUICommand(this));
+        getCommand("reveal").setExecutor(new RevealCommand(this));
+        getCommand("gui").setExecutor(new GUICommand(this));
         getCommand("grace").setExecutor(new GracePeriodCommand(this));
 
-        getLogger().info("✅ MagicalSpears (1.21.1) Enabled Successfully!");
+        getServer().getPluginManager().registerEvents(spearManager, this);
+        getLogger().info("✅ MagicalSpears enabled successfully!");
     }
 
-    @Override
-    public void onDisable() {
-        getLogger().info("❌ MagicalSpears Disabled.");
-    }
-
-    public static MagicalSpears getInstance() { return instance; }
     public CooldownManager getCooldownManager() { return cooldownManager; }
     public BossbarManager getBossbarManager() { return bossbarManager; }
     public SpearManager getSpearManager() { return spearManager; }
-}
 
+    public boolean isGraceActive() { return graceActive; }
+    public void setGraceActive(boolean active) { this.graceActive = active; }
+}
