@@ -1,0 +1,17 @@
+name: MagicalSpears
+main: com.minetwice.magicalspears.MagicalSpears
+version: 1.0
+api-version: 1.21.1
+author: Minetwice
+commands:
+  givespear:
+    description: Give a player a specific spear.
+  givespears:
+    description: Give a player all spears.
+  cords:
+    description: Show or hide a player's coordinates.
+  spears:
+    description: Open GUI showing all spears.
+  grace:
+    description: Start grace period timer.
+    
