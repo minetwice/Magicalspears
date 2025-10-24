@@ -1,58 +1,52 @@
 package com.minetwice.magicalspears;
 
-import org.bukkit.plugin.java.JavaPlugin;
-import com.minetwice.magicalspears.managers.CooldownManager;
-import com.minetwice.magicalspears.managers.BossbarManager;
+import com.minetwice.magicalspears.commands.GiveSpearCommand;
+import com.minetwice.magicalspears.commands.GracePeriodCommand;
+import com.minetwice.magicalspears.commands.GiveAllSpearsCommand;
+import com.minetwice.magicalspears.commands.SpearsGUICommand;
+import com.minetwice.magicalspears.listeners.SpearHitListener;
 import com.minetwice.magicalspears.managers.SpearManager;
-import com.minetwice.magicalspears.commands.*;
-import com.minetwice.magicalspears.listeners.*;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class MagicalSpears extends JavaPlugin {
-
-    private static MagicalSpears instance;
-    private CooldownManager cooldownManager;
-    private BossbarManager bossbarManager;
+public class MagicalSpears extends JavaPlugin {
+    
     private SpearManager spearManager;
-
+    private boolean graceActive = false;
+    
     @Override
     public void onEnable() {
-        instance = this;
-
-        cooldownManager = new CooldownManager();
-        bossbarManager = new BossbarManager();
-        spearManager = new SpearManager();
-
+        // Initialize managers
+        this.spearManager = new SpearManager(this);
+        
         // Register commands
-        getCommand("givespear").setExecutor(new GiveSpearCommand(this));
-        getCommand("giveallspears").setExecutor(new GiveAllSpearsCommand(this));
-        getCommand("cords").setExecutor(new CordsCommand(this));
+        getCommand("givespear").setExecutor(new GiveSpearCommand(this, spearManager));
         getCommand("graceperiod").setExecutor(new GracePeriodCommand(this));
-        getCommand("spearui").setExecutor(new SpearsGUICommand(this));
-
+        getCommand("giveallspears").setExecutor(new GiveAllSpearsCommand(this, spearManager));
+        getCommand("spearsgui").setExecutor(new SpearsGUICommand(this, spearManager));
+        
         // Register listeners
-        getServer().getPluginManager().registerEvents(new SpearHitListener(this), this);
-
-        getLogger().info("MagicalSpears plugin enabled!");
+        getServer().getPluginManager().registerEvents(new SpearHitListener(this, spearManager), this);
+        
+        // Save default config
+        saveDefaultConfig();
+        
+        getLogger().info("MagicalSpears has been enabled!");
     }
-
+    
     @Override
     public void onDisable() {
-        getLogger().info("MagicalSpears plugin disabled!");
+        getLogger().info("MagicalSpears has been disabled!");
     }
-
-    public static MagicalSpears getInstance() {
-        return instance;
-    }
-
-    public CooldownManager getCooldownManager() {
-        return cooldownManager;
-    }
-
-    public BossbarManager getBossbarManager() {
-        return bossbarManager;
-    }
-
+    
     public SpearManager getSpearManager() {
         return spearManager;
+    }
+    
+    public boolean isGraceActive() {
+        return graceActive;
+    }
+    
+    public void setGraceActive(boolean active) {
+        this.graceActive = active;
     }
 }
