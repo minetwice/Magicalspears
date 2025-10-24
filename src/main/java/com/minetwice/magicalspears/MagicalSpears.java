@@ -1,48 +1,58 @@
-package com.minetwice.magicalspears.managers;
+package com.minetwice.magicalspears;
 
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
+import com.minetwice.magicalspears.managers.CooldownManager;
+import com.minetwice.magicalspears.managers.BossbarManager;
+import com.minetwice.magicalspears.managers.SpearManager;
+import com.minetwice.magicalspears.commands.*;
+import com.minetwice.magicalspears.listeners.*;
 
-import java.util.ArrayList;
-import java.util.List;
+public final class MagicalSpears extends JavaPlugin {
 
-public class SpearManager {
+    private static MagicalSpears instance;
+    private CooldownManager cooldownManager;
+    private BossbarManager bossbarManager;
+    private SpearManager spearManager;
 
-    public enum SpearType {
-        POISON,
-        FIRE,
-        ICE,
-        LIGHTNING
+    @Override
+    public void onEnable() {
+        instance = this;
+
+        cooldownManager = new CooldownManager();
+        bossbarManager = new BossbarManager();
+        spearManager = new SpearManager();
+
+        // Register commands
+        getCommand("givespear").setExecutor(new GiveSpearCommand(this));
+        getCommand("giveallspears").setExecutor(new GiveAllSpearsCommand(this));
+        getCommand("cords").setExecutor(new CordsCommand(this));
+        getCommand("graceperiod").setExecutor(new GracePeriodCommand(this));
+        getCommand("spearui").setExecutor(new SpearsGUICommand(this));
+
+        // Register listeners
+        getServer().getPluginManager().registerEvents(new SpearHitListener(this), this);
+
+        getLogger().info("MagicalSpears plugin enabled!");
     }
 
-    public ItemStack createSpear(SpearType type) {
-        ItemStack spear = new ItemStack(Material.TRIDENT);
-        ItemMeta meta = spear.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName("§b" + type.name() + " Spear");
-            meta.setLocalizedName(type.name().toLowerCase());
-            spear.setItemMeta(meta);
-        }
-        return spear;
+    @Override
+    public void onDisable() {
+        getLogger().info("MagicalSpears plugin disabled!");
     }
 
-    public SpearType getSpearType(ItemStack item) {
-        if (item == null || !item.hasItemMeta() || item.getItemMeta() == null) return null;
-        String name = item.getItemMeta().getLocalizedName();
-        if (name == null) return null;
-        try {
-            return SpearType.valueOf(name.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+    public static MagicalSpears getInstance() {
+        return instance;
     }
 
-    public List<ItemStack> getAllSpears() {
-        List<ItemStack> list = new ArrayList<>();
-        for (SpearType type : SpearType.values()) {
-            list.add(createSpear(type));
-        }
-        return list;
+    public CooldownManager getCooldownManager() {
+        return cooldownManager;
+    }
+
+    public BossbarManager getBossbarManager() {
+        return bossbarManager;
+    }
+
+    public SpearManager getSpearManager() {
+        return spearManager;
     }
 }
