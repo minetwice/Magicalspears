@@ -1,43 +1,55 @@
-
 package com.minetwice.magicalspears.commands;
 
 import com.minetwice.magicalspears.MagicalSpears;
 import com.minetwice.magicalspears.managers.SpearManager;
-import net.kyori.adventure.text.Component;
+import com.minetwice.magicalspears.managers.SpearManager.SpearType;
 import org.bukkit.Bukkit;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class GiveSpearCommand implements CommandExecutor {
-
+    
     private final MagicalSpears plugin;
-
-    public GiveSpearCommand(MagicalSpears plugin) {
+    private final SpearManager spearManager;
+    
+    public GiveSpearCommand(MagicalSpears plugin, SpearManager spearManager) {
         this.plugin = plugin;
+        this.spearManager = spearManager;
     }
-
-    // usage: /givespear <player> <spearname>
+    
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length < 2) {
-            sender.sendMessage(Component.text("Usage: /givespear <player> <INFERNO|FROST|STORM|SOUL|WIND|TIDAL>"));
+        if (!sender.hasPermission("magicalspears.give")) {
+            sender.sendMessage("§cYou don't have permission to use this command!");
             return true;
         }
+        
+        if (args.length < 2) {
+            sender.sendMessage("§cUsage: /givespear <player> <type>");
+            sender.sendMessage("§eTypes: FIRE, ICE, LIGHTNING, POISON, KNOCKBACK, WITHER");
+            return true;
+        }
+        
         Player target = Bukkit.getPlayer(args[0]);
         if (target == null) {
-            sender.sendMessage(Component.text("Player not found."));
+            sender.sendMessage("§cPlayer not found!");
             return true;
         }
+        
+        SpearType type;
         try {
-            SpearManager.SpearType type = SpearManager.SpearType.valueOf(args[1].toUpperCase());
-            ItemStack spear = plugin.getSpearManager().getSpear(type);
-            target.getInventory().addItem(spear);
-            sender.sendMessage(Component.text("Gave " + type.name() + " to " + target.getName()));
-            target.sendMessage(Component.text("You received " + type.name()));
-        } catch (IllegalArgumentException ex) {
-            sender.sendMessage(Component.text("Invalid spear name."));
+            type = SpearType.valueOf(args[1].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage("§cInvalid spear type! Valid types: FIRE, ICE, LIGHTNING, POISON, KNOCKBACK, WITHER");
+            return true;
         }
+        
+        target.getInventory().addItem(spearManager.getSpear(type));
+        target.sendMessage("§aYou received a " + type.name() + " spear!");
+        sender.sendMessage("§aGave " + target.getName() + " a " + type.name() + " spear!");
+        
         return true;
     }
 }
