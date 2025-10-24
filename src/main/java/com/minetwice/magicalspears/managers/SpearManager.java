@@ -8,7 +8,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class SpearManager {
@@ -96,5 +98,13 @@ public class SpearManager {
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
+    }
+    
+    public List<ItemStack> getAllSpears() {
+        List<ItemStack> spears = new ArrayList<>();
+        for (SpearType type : SpearType.values()) {
+            spears.add(getSpear(type));
+        }
+        return spears;
     }
 }
