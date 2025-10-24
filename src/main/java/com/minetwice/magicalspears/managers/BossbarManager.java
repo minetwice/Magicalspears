@@ -1,76 +1,103 @@
 package com.minetwice.magicalspears.managers;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class BossbarManager {
+    private final Map<UUID, BossBar> cooldownBars = new HashMap<>();
 
-    private final Plugin plugin;
-    // mapping an id → bossbar so we can cancel
-    private final Map<UUID, BossBar> activeBars = new HashMap<>();
-
-    public BossbarManager(Plugin plugin) {
-        this.plugin = plugin;
+    public void showCooldownBar(Player player, String spearType, int cooldownSeconds) {
+        UUID uuid = player.getUniqueId();
+        
+        removeBossbar(player);
+        
+        String title = spearType + " Cooldown";
+        BossBar bossBar = Bukkit.createBossBar(
+            title,
+            getBarColor(spearType),
+            BarStyle.SOLID
+        );
+        
+        bossBar.addPlayer(player);
+        bossBar.setProgress(1.0);
+        cooldownBars.put(uuid, bossBar);
+        
+        startCooldownCountdown(player, bossBar, cooldownSeconds);
     }
 
-    /**
-     * Show coordinates of 'target' to all players for durationSeconds
-     */
-    public void revealCoordsToAll(UUID targetId, Location loc, int durationSeconds) {
-        // create bar text
-        String title = "LOC - " + loc.getWorld().getName()
-                + " X:" + loc.getBlockX()
-                + " Y:" + loc.getBlockY()
-                + " Z:" + loc.getBlockZ();
-
-        BossBar bar = Bukkit.createBossBar(Component.text(title), BarColor.GREEN, BarStyle.SOLID);
-        // add all online players
-        for (Player p : Bukkit.getOnlinePlayers()) bar.addPlayer(p);
-        UUID id = targetId;
-        activeBars.put(id, bar);
-
-        // schedule removal after duration
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            BossBar b = activeBars.remove(id);
-            if (b != null) {
-                for (Player p : Bukkit.getOnlinePlayers()) b.removePlayer(p);
-                b.setVisible(false);
-            }
-        }, durationSeconds * 20L);
+    public void showEffectBar(Player player, String effectName, int durationSeconds) {
+        UUID uuid = player.getUniqueId();
+        
+        removeBossbar(player);
+        
+        BossBar bossBar = Bukkit.createBossBar(
+            effectName,
+            BarColor.PURPLE,
+            BarStyle.SOLID
+        );
+        
+        bossBar.addPlayer(player);
+        bossBar.setProgress(1.0);
+        cooldownBars.put(uuid, bossBar);
+        
+        startCooldownCountdown(player, bossBar, durationSeconds);
     }
 
-    /**
-     * Show custom bar to a player for progressSeconds (used for cords progress)
-     */
-    public void showProgressToPlayer(Player p, String text, int progressSeconds) {
-        BossBar bar = Bukkit.createBossBar(Component.text(text), BarColor.YELLOW, BarStyle.SEGMENTED_10);
-        bar.addPlayer(p);
-
-        final int totalTicks = progressSeconds * 20;
-        // update percent periodically
-        final int taskId = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
-            int elapsed = 0;
-            @Override
-            public void run() {
-                elapsed += 5;
-                double percent = Math.max(0, 1.0 - (elapsed / (double) totalTicks));
-                bar.setProgress(percent);
-                if (elapsed >= totalTicks) {
-                    bar.removePlayer(p);
-                    bar.setVisible(false);
-                    Bukkit.getScheduler().cancelTask(taskId);
+    private void startCooldownCountdown(Player player, BossBar bossBar, int seconds) {
+        Bukkit.getScheduler().runTaskTimer(
+            com.minetwice.magicalspears.MagicalSpears.getInstance(),
+            new Runnable() {
+                int remaining = seconds * 20;
+                
+                @Override
+                public void run() {
+                    if (!player.isOnline() || remaining <= 0) {
+                        removeBossbar(player);
+                        return;
+                    }
+                    
+                    double progress = (double) remaining / (seconds * 20);
+                    bossBar.setProgress(Math.max(0, Math.min(1, progress)));
+                    
+                    remaining -= 2;
                 }
-            }
-        }, 0L, 5L).getTaskId();
+            },
+            0L,
+            2L
+        );
     }
 
-}
+    public void removeBossbar(Player player) {
+        UUID uuid = player.getUniqueId();
+        if (cooldownBars.containsKey(uuid)) {
+            BossBar bar = cooldownBars.get(uuid);
+            bar.removePlayer(player);
+            bar.removeAll();
+            cooldownBars.remove(uuid);
+        }
+    }
 
+    public void removeAllBossbars() {
+        cooldownBars.values().forEach(BossBar::removeAll);
+        cooldownBars.clear();
+    }
+
+    private BarColor getBarColor(String spearType) {
+        return switch (spearType.toLowerCase()) {
+            case "inferno" -> BarColor.RED;
+            case "frost" -> BarColor.BLUE;
+            case "storm" -> BarColor.YELLOW;
+            case "soul" -> BarColor.PURPLE;
+            case "wind" -> BarColor.WHITE;
+            case "tidal" -> BarColor.BLUE;
+            default -> BarColor.WHITE;
+        };
+    }
+}
