@@ -30,69 +30,43 @@ public class SpearManager {
 
         if (meta == null) return spear;
 
-        // Set spear type in persistent data
         meta.getPersistentDataContainer().set(
             spearTypeKey,
             PersistentDataType.STRING,
             type.toLowerCase()
         );
 
-        // Configure based on type
         switch (type.toLowerCase()) {
             case "inferno":
                 meta.displayName(Component.text("Inferno Spear", NamedTextColor.RED, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Burns enemies on hit",
-                    "Cooldown: 30s",
-                    NamedTextColor.GOLD
-                ));
+                meta.lore(createLore("Burns enemies on hit", "Cooldown: 30s", NamedTextColor.GOLD));
                 meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true);
                 break;
 
             case "frost":
                 meta.displayName(Component.text("Frost Spear", NamedTextColor.AQUA, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Freezes enemies on hit",
-                    "Cooldown: 25s",
-                    NamedTextColor.AQUA
-                ));
+                meta.lore(createLore("Freezes enemies on hit", "Cooldown: 25s", NamedTextColor.AQUA));
                 break;
 
             case "storm":
                 meta.displayName(Component.text("Storm Spear", NamedTextColor.YELLOW, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Strikes lightning on hit",
-                    "Cooldown: 35s",
-                    NamedTextColor.YELLOW
-                ));
+                meta.lore(createLore("Strikes lightning on hit", "Cooldown: 35s", NamedTextColor.YELLOW));
                 break;
 
             case "soul":
                 meta.displayName(Component.text("Soul Spear", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Drains life from enemies",
-                    "Cooldown: 40s",
-                    NamedTextColor.LIGHT_PURPLE
-                ));
+                meta.lore(createLore("Drains life from enemies", "Cooldown: 40s", NamedTextColor.LIGHT_PURPLE));
                 break;
 
             case "wind":
                 meta.displayName(Component.text("Wind Spear", NamedTextColor.WHITE, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Knocks back enemies",
-                    "Cooldown: 20s",
-                    NamedTextColor.GRAY
-                ));
+                meta.lore(createLore("Knocks back enemies", "Cooldown: 20s", NamedTextColor.GRAY));
                 meta.addEnchant(Enchantment.KNOCKBACK, 2, true);
                 break;
 
             case "tidal":
                 meta.displayName(Component.text("Tidal Spear", NamedTextColor.BLUE, TextDecoration.BOLD));
-                meta.lore(createLore(
-                    "Creates water effects",
-                    "Cooldown: 30s",
-                    NamedTextColor.DARK_AQUA
-                ));
+                meta.lore(createLore("Creates water effects", "Cooldown: 30s", NamedTextColor.DARK_AQUA));
                 break;
         }
 
