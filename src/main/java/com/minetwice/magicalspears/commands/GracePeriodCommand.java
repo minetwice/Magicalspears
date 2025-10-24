@@ -1,32 +1,41 @@
 package com.minetwice.magicalspears.commands;
 
 import com.minetwice.magicalspears.MagicalSpears;
-import net.kyori.adventure.text.Component;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class GracePeriodCommand implements CommandExecutor {
-
+    
     private final MagicalSpears plugin;
-
+    
     public GracePeriodCommand(MagicalSpears plugin) {
         this.plugin = plugin;
     }
-
-    // /grace -> toggles start 15 minutes
+    
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (plugin.isGraceActive()) {
-            sender.sendMessage(Component.text("Grace is already active."));
+        if (!sender.hasPermission("magicalspears.graceperiod")) {
+            sender.sendMessage("§cYou don't have permission to use this command!");
             return true;
         }
-        plugin.setGraceActive(true);
-        plugin.getServer().broadcast(Component.text("Grace period started: 15 minutes. PvP is disabled."));
-        // schedule end
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+        
+        if (args.length == 0) {
+            sender.sendMessage("§eGrace period is currently: §" + (plugin.isGraceActive() ? "aENABLED" : "cDISABLED"));
+            return true;
+        }
+        
+        if (args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("enable")) {
+            plugin.setGraceActive(true);
+            sender.sendMessage("§aGrace period has been enabled! Spears are now disabled.");
+            return true;
+        } else if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("disable")) {
             plugin.setGraceActive(false);
-            plugin.getServer().broadcast(Component.text("Grace period ended. PvP is enabled."));
-        }, 15 * 60 * 20L);
-        return true;
+            sender.sendMessage("§cGrace period has been disabled! Spears are now active.");
+            return true;
+        } else {
+            sender.sendMessage("§cUsage: /graceperiod <on|off>");
+            return true;
+        }
     }
 }
-
