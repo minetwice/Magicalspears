@@ -1,47 +1,100 @@
 package com.minetwice.magicalspears.managers;
 
+import com.minetwice.magicalspears.MagicalSpears;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public class SpearManager {
-
+    
+    private final MagicalSpears plugin;
+    private final NamespacedKey spearTypeKey;
+    
     public enum SpearType {
-        POISON,
-        FIRE,
-        ICE,
-        LIGHTNING
+        FIRE, ICE, LIGHTNING, POISON, KNOCKBACK, WITHER
     }
-
-    public ItemStack createSpear(SpearType type) {
-        ItemStack spear = new ItemStack(Material.TRIDENT);
+    
+    public SpearManager(MagicalSpears plugin) {
+        this.plugin = plugin;
+        this.spearTypeKey = new NamespacedKey(plugin, "spear_type");
+    }
+    
+    public ItemStack getSpear(SpearType type) {
+        ItemStack spear = new ItemStack(Material.IRON_SWORD);
         ItemMeta meta = spear.getItemMeta();
+        
         if (meta != null) {
-            meta.setDisplayName("§b" + type.name() + " Spear");
-            meta.setLocalizedName(type.name().toLowerCase());
+            // Set name and lore based on type
+            switch (type) {
+                case FIRE:
+                    meta.setDisplayName("§6§lFire Spear");
+                    meta.setLore(Arrays.asList("§7Sets enemies on fire", "§7upon impact"));
+                    meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true);
+                    break;
+                case ICE:
+                    meta.setDisplayName("§b§lIce Spear");
+                    meta.setLore(Arrays.asList("§7Freezes enemies", "§7and slows them down"));
+                    meta.addEnchant(Enchantment.SHARPNESS, 3, true);
+                    break;
+                case LIGHTNING:
+                    meta.setDisplayName("§e§lLightning Spear");
+                    meta.setLore(Arrays.asList("§7Strikes lightning", "§7on impact"));
+                    meta.addEnchant(Enchantment.SHARPNESS, 4, true);
+                    break;
+                case POISON:
+                    meta.setDisplayName("§2§lPoison Spear");
+                    meta.setLore(Arrays.asList("§7Poisons enemies", "§7on impact"));
+                    meta.addEnchant(Enchantment.BANE_OF_ARTHROPODS, 3, true);
+                    break;
+                case KNOCKBACK:
+                    meta.setDisplayName("§f§lKnockback Spear");
+                    meta.setLore(Arrays.asList("§7Launches enemies", "§7into the air"));
+                    meta.addEnchant(Enchantment.KNOCKBACK, 3, true);
+                    break;
+                case WITHER:
+                    meta.setDisplayName("§8§lWither Spear");
+                    meta.setLore(Arrays.asList("§7Applies wither effect", "§7to enemies"));
+                    meta.addEnchant(Enchantment.SHARPNESS, 3, true);
+                    break;
+            }
+            
+            // Add unbreaking
+            meta.addEnchant(Enchantment.UNBREAKING, 3, true);
+            
+            // Store spear type in persistent data
+            meta.getPersistentDataContainer().set(spearTypeKey, PersistentDataType.STRING, type.name());
+            
             spear.setItemMeta(meta);
         }
+        
         return spear;
     }
-
-    public SpearType getSpearType(ItemStack item) {
-        if (item == null || !item.hasItemMeta() || item.getItemMeta() == null) return null;
-        String name = item.getItemMeta().getLocalizedName();
-        if (name == null) return null;
+    
+    public Optional<SpearType> getSpearType(ItemStack item) {
+        if (item == null || item.getType() != Material.IRON_SWORD) {
+            return Optional.empty();
+        }
+        
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return Optional.empty();
+        }
+        
+        String typeString = meta.getPersistentDataContainer().get(spearTypeKey, PersistentDataType.STRING);
+        if (typeString == null) {
+            return Optional.empty();
+        }
+        
         try {
-            return SpearType.valueOf(name.toUpperCase());
+            return Optional.of(SpearType.valueOf(typeString));
         } catch (IllegalArgumentException e) {
-            return null;
+            return Optional.empty();
         }
-    }
-
-    public List<ItemStack> getAllSpears() {
-        List<ItemStack> list = new ArrayList<>();
-        for (SpearType type : SpearType.values()) {
-            list.add(createSpear(type));
-        }
-        return list;
     }
 }
