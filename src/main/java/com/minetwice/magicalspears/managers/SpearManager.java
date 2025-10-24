@@ -1,11 +1,10 @@
-import org.bukkit.util.Vector;
 package com.minetwice.magicalspears.managers;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpearManager {
 
@@ -19,14 +18,16 @@ public class SpearManager {
     public ItemStack createSpear(SpearType type) {
         ItemStack spear = new ItemStack(Material.TRIDENT);
         ItemMeta meta = spear.getItemMeta();
-        meta.setDisplayName("§b" + type.name() + " Spear");
-        meta.setLocalizedName(type.name().toLowerCase());
-        spear.setItemMeta(meta);
+        if (meta != null) {
+            meta.setDisplayName("§b" + type.name() + " Spear");
+            meta.setLocalizedName(type.name().toLowerCase());
+            spear.setItemMeta(meta);
+        }
         return spear;
     }
 
     public SpearType getSpearType(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return null;
+        if (item == null || !item.hasItemMeta() || item.getItemMeta() == null) return null;
         String name = item.getItemMeta().getLocalizedName();
         if (name == null) return null;
         try {
