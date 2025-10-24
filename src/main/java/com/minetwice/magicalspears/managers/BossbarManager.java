@@ -1,35 +1,42 @@
 package com.minetwice.magicalspears.managers;
 
 import org.bukkit.Bukkit;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
+import org.bukkit.Location;
+import org.bukkit.boss.*;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class BossbarManager {
 
-    private final HashMap<UUID, BossBar> bars = new HashMap<>();
+    private final Map<UUID, BossBar> bars = new HashMap<>();
 
-    public void showBar(Player player, String title, BarColor color, BarStyle style, double progress) {
-        BossBar bar = Bukkit.createBossBar(title, color, style);
-        bar.setProgress(progress);
+    public void showProgressToPlayer(Player player, String title, int durationTicks) {
+        BossBar bar = Bukkit.createBossBar(title, BarColor.BLUE, BarStyle.SEGMENTED_10);
         bar.addPlayer(player);
         bars.put(player.getUniqueId(), bar);
+
+        Bukkit.getScheduler().runTaskTimer(Bukkit.getPluginManager().getPlugin("MagicalSpears"), task -> {
+            double progress = bar.getProgress() - (1.0 / (durationTicks / 20.0));
+            if (progress <= 0) {
+                bar.removeAll();
+                bars.remove(player.getUniqueId());
+                task.cancel();
+            } else {
+                bar.setProgress(progress);
+            }
+        }, 0L, 20L);
     }
 
-    public void updateBar(Player player, double progress, String newTitle) {
-        BossBar bar = bars.get(player.getUniqueId());
-        if (bar != null) {
-            bar.setProgress(progress);
-            if (newTitle != null) bar.setTitle(newTitle);
+    public void revealCoordsToAll(UUID source, Location loc, int seconds) {
+        String msg = "§aPlayer " + source + " is at X=" + loc.getBlockX() + " Y=" + loc.getBlockY() + " Z=" + loc.getBlockZ();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.sendMessage(msg);
         }
-    }
-
-    public void removeBar(Player player) {
-        BossBar bar = bars.remove(player.getUniqueId());
-        if (bar != null) bar.removeAll();
+        Bukkit.getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("MagicalSpears"), () -> {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.sendMessage("§7[Coords hidden again]");
+            }
+        }, seconds * 20L);
     }
 }
