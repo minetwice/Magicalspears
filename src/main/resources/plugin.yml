@@ -1,17 +1,97 @@
 name: MagicalSpears
+version: '1.0'
 main: com.minetwice.magicalspears.MagicalSpears
-version: 1.0
-api-version: 1.21.1
-author: Minetwice
+api-version: '1.20'
+author: MineTwice
+description: Magical spears plugin with special abilities
+
 commands:
   givespear:
-    description: Give a player a specific spear.
-  givespears:
-    description: Give a player all spears.
+    description: Give a magical spear to a player
+    usage: /givespear <player> <type>
+    permission: magicalspears.give
+  
+  giveallspears:
+    description: Give all magical spears to a player
+    usage: /giveallspears <player>
+    permission: magicalspears.giveall
+  
   cords:
-    description: Show or hide a player's coordinates.
-  spears:
-    description: Open GUI showing all spears.
-  grace:
-    description: Start grace period timer.
-    
+    description: Get coordinates of a player
+    usage: /cords <player>
+    permission: magicalspears.cords
+  
+  spearsgui:
+    description: Open magical spears GUI
+    usage: /spearsgui
+    permission: magicalspears.gui
+  
+  graceperiod:
+    description: Toggle grace period (disables spears)
+    usage: /graceperiod <on|off>
+    permission: magicalspears.graceperiod
+
+permissions:
+  magicalspears.*:
+    description: Gives access to all MagicalSpears commands
+    children:
+      magicalspears.give: true
+      magicalspears.giveall: true
+      magicalspears.cords: true
+      magicalspears.gui: true
+      magicalspears.graceperiod: true
+      magicalspears.get.*: true
+  
+  magicalspears.give:
+    description: Allows giving spears to players
+    default: op
+  
+  magicalspears.giveall:
+    description: Allows giving all spears to players
+    default: op
+  
+  magicalspears.cords:
+    description: Allows checking player coordinates
+    default: op
+  
+  magicalspears.gui:
+    description: Allows opening the spears GUI
+    default: true
+  
+  magicalspears.graceperiod:
+    description: Allows toggling grace period
+    default: op
+  
+  magicalspears.get.*:
+    description: Allows getting all spear types from GUI
+    children:
+      magicalspears.get.inferno: true
+      magicalspears.get.frost: true
+      magicalspears.get.storm: true
+      magicalspears.get.soul: true
+      magicalspears.get.wind: true
+      magicalspears.get.tidal: true
+  
+  magicalspears.get.inferno:
+    description: Allows getting inferno spear
+    default: true
+  
+  magicalspears.get.frost:
+    description: Allows getting frost spear
+    default: true
+  
+  magicalspears.get.storm:
+    description: Allows getting storm spear
+    default: true
+  
+  magicalspears.get.soul:
+    description: Allows getting soul spear
+    default: true
+  
+  magicalspears.get.wind:
+    description: Allows getting wind spear
+    default: true
+  
+  magicalspears.get.tidal:
+    description: Allows getting tidal spear
+    default: true
