@@ -1,34 +1,49 @@
 package com.minetwice.magicalspears;
 
-import com.minetwice.magicalspears.commands.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MagicalSpears extends JavaPlugin {
+import com.minetwice.magicalspears.managers.CooldownManager;
+import com.minetwice.magicalspears.managers.BossbarManager;
+import com.minetwice.magicalspears.managers.SpearManager;
 
+public final class MagicalSpears extends JavaPlugin {
+
+    private static MagicalSpears instance;
     private CooldownManager cooldownManager;
     private BossbarManager bossbarManager;
     private SpearManager spearManager;
-    private boolean graceActive = false;
 
     @Override
     public void onEnable() {
-        cooldownManager = new CooldownManager(this);
-        bossbarManager = new BossbarManager(this);
-        spearManager = new SpearManager(this);
+        instance = this;
+        getLogger().info("MagicalSpears plugin is starting...");
 
-        getCommand("givespear").setExecutor(new GiveSpearCommand(this));
-        getCommand("reveal").setExecutor(new RevealCommand(this));
-        getCommand("gui").setExecutor(new GUICommand(this));
-        getCommand("grace").setExecutor(new GracePeriodCommand(this));
+        // Initialize managers
+        cooldownManager = new CooldownManager();
+        bossbarManager = new BossbarManager();
+        spearManager = new SpearManager();
 
-        getServer().getPluginManager().registerEvents(spearManager, this);
-        getLogger().info("✅ MagicalSpears enabled successfully!");
+        getLogger().info("All managers initialized successfully!");
     }
 
-    public CooldownManager getCooldownManager() { return cooldownManager; }
-    public BossbarManager getBossbarManager() { return bossbarManager; }
-    public SpearManager getSpearManager() { return spearManager; }
+    @Override
+    public void onDisable() {
+        getLogger().info("MagicalSpears plugin has been disabled!");
+    }
 
-    public boolean isGraceActive() { return graceActive; }
-    public void setGraceActive(boolean active) { this.graceActive = active; }
+    public static MagicalSpears getInstance() {
+        return instance;
+    }
+
+    public CooldownManager getCooldownManager() {
+        return cooldownManager;
+    }
+
+    public BossbarManager getBossbarManager() {
+        return bossbarManager;
+    }
+
+    public SpearManager getSpearManager() {
+        return spearManager;
+    }
 }
