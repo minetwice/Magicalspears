@@ -1,7 +1,7 @@
 name: MagicalSpears
 version: '1.0'
 main: com.minetwice.magicalspears.MagicalSpears
-api-version: '1.20'
+api-version: '1.21'
 author: MineTwice
 description: Magical spears plugin with special abilities
 
