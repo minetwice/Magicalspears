@@ -1,34 +1,32 @@
 package com.minetwice.magicalspears;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.minetwice.magicalspears.managers.CooldownManager;
-import com.minetwice.magicalspears.managers.BossbarManager;
-import com.minetwice.magicalspears.managers.SpearManager;
+import com.minetwice.magicalspears.managers.*;
 
 public final class MagicalSpears extends JavaPlugin {
 
     private static MagicalSpears instance;
+
     private CooldownManager cooldownManager;
     private BossbarManager bossbarManager;
     private SpearManager spearManager;
 
+    private boolean graceActive = false; // for grace period system
+
     @Override
     public void onEnable() {
         instance = this;
-        getLogger().info("MagicalSpears plugin is starting...");
 
-        // Initialize managers
         cooldownManager = new CooldownManager();
         bossbarManager = new BossbarManager();
         spearManager = new SpearManager();
 
-        getLogger().info("All managers initialized successfully!");
+        getLogger().info("✅ MagicalSpears enabled successfully!");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("MagicalSpears plugin has been disabled!");
+        getLogger().info("❌ MagicalSpears disabled.");
     }
 
     public static MagicalSpears getInstance() {
@@ -45,5 +43,14 @@ public final class MagicalSpears extends JavaPlugin {
 
     public SpearManager getSpearManager() {
         return spearManager;
+    }
+
+    // --- Grace period system ---
+    public boolean isGraceActive() {
+        return graceActive;
+    }
+
+    public void setGraceActive(boolean active) {
+        this.graceActive = active;
     }
 }
