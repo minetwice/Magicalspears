@@ -1,56 +1,48 @@
-package com.minetwice.magicalspears;
+package com.minetwice.magicalspears.managers;
 
-import org.bukkit.plugin.java.JavaPlugin;
-import com.minetwice.magicalspears.managers.*;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-public final class MagicalSpears extends JavaPlugin {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static MagicalSpears instance;
+public class SpearManager {
 
-    private CooldownManager cooldownManager;
-    private BossbarManager bossbarManager;
-    private SpearManager spearManager;
-
-    private boolean graceActive = false; // for grace period system
-
-    @Override
-    public void onEnable() {
-        instance = this;
-
-        cooldownManager = new CooldownManager();
-        bossbarManager = new BossbarManager();
-        spearManager = new SpearManager();
-
-        getLogger().info("✅ MagicalSpears enabled successfully!");
+    public enum SpearType {
+        POISON,
+        FIRE,
+        ICE,
+        LIGHTNING
     }
 
-    @Override
-    public void onDisable() {
-        getLogger().info("❌ MagicalSpears disabled.");
+    public ItemStack createSpear(SpearType type) {
+        ItemStack spear = new ItemStack(Material.TRIDENT);
+        ItemMeta meta = spear.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName("§b" + type.name() + " Spear");
+            meta.setLocalizedName(type.name().toLowerCase());
+            spear.setItemMeta(meta);
+        }
+        return spear;
     }
 
-    public static MagicalSpears getInstance() {
-        return instance;
+    public SpearType getSpearType(ItemStack item) {
+        if (item == null || !item.hasItemMeta() || item.getItemMeta() == null) return null;
+        String name = item.getItemMeta().getLocalizedName();
+        if (name == null) return null;
+        try {
+            return SpearType.valueOf(name.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
-    public CooldownManager getCooldownManager() {
-        return cooldownManager;
-    }
-
-    public BossbarManager getBossbarManager() {
-        return bossbarManager;
-    }
-
-    public SpearManager getSpearManager() {
-        return spearManager;
-    }
-
-    // --- Grace period system ---
-    public boolean isGraceActive() {
-        return graceActive;
-    }
-
-    public void setGraceActive(boolean active) {
-        this.graceActive = active;
+    public List<ItemStack> getAllSpears() {
+        List<ItemStack> list = new ArrayList<>();
+        for (SpearType type : SpearType.values()) {
+            list.add(createSpear(type));
+        }
+        return list;
     }
 }
