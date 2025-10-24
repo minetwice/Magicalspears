@@ -4,7 +4,6 @@ import com.minetwice.magicalspears.MagicalSpears;
 import com.minetwice.magicalspears.managers.SpearManager;
 import com.minetwice.magicalspears.managers.SpearManager.SpearType;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.LivingEntity;
@@ -73,7 +72,7 @@ public class SpearHitListener implements Listener {
             case ICE:
                 target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 100, 2));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, 100, 1));
-                location.getWorld().spawnParticle(Particle.SNOW_SHOVEL, location, 30, 0.5, 0.5, 0.5, 0.1);
+                location.getWorld().spawnParticle(Particle.SNOWFLAKE, location, 30, 0.5, 0.5, 0.5, 0.1);
                 location.getWorld().playSound(location, Sound.BLOCK_GLASS_BREAK, 1.0f, 1.5f);
                 attacker.sendMessage("§bIce Spear activated!");
                 break;
@@ -87,7 +86,7 @@ public class SpearHitListener implements Listener {
             case POISON:
                 target.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 100, 1));
                 target.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 100, 0));
-                location.getWorld().spawnParticle(Particle.SLIME, location, 30, 0.5, 0.5, 0.5, 0.1);
+                location.getWorld().spawnParticle(Particle.ITEM_SLIME, location, 30, 0.5, 0.5, 0.5, 0.1);
                 location.getWorld().playSound(location, Sound.ENTITY_SPIDER_AMBIENT, 1.0f, 0.8f);
                 attacker.sendMessage("§2Poison Spear activated!");
                 break;
@@ -102,10 +101,10 @@ public class SpearHitListener implements Listener {
                 
             case WITHER:
                 target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 1));
-                location.getWorld().spawnParticle(Particle.SMOKE, location, 30, 0.5, 0.5, 0.5, 0.1);
+                location.getWorld().spawnParticle(Particle.LARGE_SMOKE, location, 30, 0.5, 0.5, 0.5, 0.1);
                 location.getWorld().playSound(location, Sound.ENTITY_WITHER_SHOOT, 1.0f, 1.0f);
                 attacker.sendMessage("§8Wither Spear activated!");
                 break;
         }
     }
-}        
+}
